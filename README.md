@@ -5,6 +5,15 @@
 一个零依赖的 Python 桌面小工具：帮你从 GitHub 和 Bing 上找免费的 Clash / V2Ray 订阅节点，
 把订阅链接提取出来、逐条检测能不能用，再复制导入 FlClash 等客户端。
 
+## 界面预览
+
+<p align="center">
+  <img src="docs/screenshot.png" alt="免费节点搜索器桌面版主界面" width="860">
+</p>
+
+> 桌面版主界面：上方选择引擎与关键词，中间是搜索结果（双击可打开仓库/网页），左下是提取出的订阅链接，
+> 右下是逐条检测日志。没有 tkinter 的环境会自动切换成功能一致的浏览器界面。
+
 ## 运行方法（Windows）
 
 1. 确认电脑装了 Python 3.8+（没装去 python.org 下载，安装时勾选 **Add Python to PATH**）
@@ -57,4 +66,6 @@ ermaozi 官方新地址（约 172 节点；注意它仓库根目录的老 `clash
 
 - `node_searcher.py` — 主程序（单文件，桌面窗口 + 浏览器界面双模式）
 - `run.bat` — Windows 双击启动（自动挑 Python、失败保留错误窗口）
+- `docs/screenshot.png` — 界面截图（本说明里的界面预览）
+- `.gitignore` / `.gitattributes` — 忽略本地工具数据、固定 `run.bat` 为 CRLF
 - `README.md` — 本说明

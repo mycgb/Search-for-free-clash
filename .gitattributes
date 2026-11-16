@@ -2,6 +2,9 @@
 # Disable all newline conversion so the blob itself keeps CRLF on every platform.
 *.bat -text
 
+# Screenshots are binary: never apply newline conversion.
+*.png binary
+
 # Source / docs are stored with LF in the repository.
 *.py text eol=lf
 *.md text eol=lf
