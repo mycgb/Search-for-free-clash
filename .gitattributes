@@ -1,0 +1,9 @@
+# run.bat must stay pure ASCII + CRLF (Chinese Windows CMD parses it byte-wise).
+# Disable all newline conversion so the blob itself keeps CRLF on every platform.
+*.bat -text
+
+# Source / docs are stored with LF in the repository.
+*.py text eol=lf
+*.md text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
