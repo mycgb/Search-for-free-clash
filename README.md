@@ -14,6 +14,51 @@
 > 桌面版主界面：上方选择引擎与关键词，中间是搜索结果（双击可打开仓库/网页），左下是提取出的订阅链接，
 > 右下是逐条检测日志。没有 tkinter 的环境会自动切换成功能一致的浏览器界面。
 
+## 下载 / 版本发布（Windows · macOS · Linux）
+
+GitHub 的 Release 本身不区分操作系统：它就是一个 **tag + 一组附件**。「多系统」指的是在附件里放各平台各自的构建产物。
+注意 **PyInstaller 不能交叉编译**——Windows 的 exe 只能在 Windows 上打、macOS 的 `.app` 只能在 macOS 上打，所以交给 GitHub Actions 用矩阵在三个系统的 runner 上各跑一次。
+
+| Release 附件 | 适用系统 | 运行方式 |
+|---|---|---|
+| `...-windows-x64.zip` | Windows | 解压双击 `node-searcher.exe`（无黑窗口） |
+| `...-macos.zip` | macOS（Apple Silicon） | 解压出 `NodeSearcher.app`；未签名，右键 → 打开 |
+| `...-linux-x64.zip` | Linux x64 | 解压后 `chmod +x node-searcher && ./node-searcher` |
+| `...-source.zip` | 全部 | 只要有 Python 3.8+：Windows 双击 `run.bat`，macOS/Linux `sh run.sh` |
+| `SHA256SUMS.txt` | — | 校验下载文件完整性 |
+
+源码包是最稳的跨平台选择：程序零第三方依赖，且**没有 tkinter 会自动切换成浏览器界面**，功能与桌面版一致。
+
+### 发布一个新版本
+
+1. 改 `node_searcher.py` 里的 `APP_VERSION`，提交并推送；
+2. 打 tag 并推送（tag 必须以 `v` 开头）：
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+3. Actions 里的 **Release (multi-platform)** 自动执行：三个系统并行构建 → 打包 zip → 生成校验和 → 用 `gh release create` / `gh release upload` 发布。仓库右侧 **Releases** 页面即可下载。
+
+也可以完全手动：在 Releases 页面点 **Draft a new release**，选 tag、填标题，把本地 `out/*.zip` 拖进附件框，发布即可；命令行则是 `gh release create v1.0.0 out/*.zip --generate-notes`。
+
+### 先验证构建，不发布
+
+在 Actions 页手动 **Run workflow**（`workflow_dispatch`）：只构建并上传 artifacts，**不会创建 Release**。等三个平台都绿了再打 tag 正式发布。某个平台构建失败也不会阻塞其它平台附件的发布（publish job 用了 `always()`）。
+
+### 本地打自己系统的包
+
+```bash
+pip install pyinstaller
+python build_release.py                 # 当前系统的二进制 zip，输出到 out/
+python build_release.py --source-only   # 通用源码 zip，不需要 PyInstaller
+```
+
+可用环境变量 `RELEASE_VERSION`、`RELEASE_PLATFORM` 覆盖版本号与产物名（CI 里已自动传入 tag 名）。
+
+> 平台差异：Windows 用 `--onefile --windowed`（程序已为 `sys.stdout/stderr=None` 加了哑 writer，不会因 `print` 崩掉）；macOS 用 `.app` 且**不加 `--onefile`**（PyInstaller 7 不允许），首次打开会被 Gatekeeper 拦，需在「系统设置 → 隐私与安全性」允许；Linux 包在较老 glibc 的 runner 上构建，旧发行版若缺 Tcl/Tk 运行库，改用源码包即可。
+
 ## 运行方法（Windows）
 
 1. 确认电脑装了 Python 3.8+（没装去 python.org 下载，安装时勾选 **Add Python to PATH**）
@@ -66,6 +111,9 @@ ermaozi 官方新地址（约 172 节点；注意它仓库根目录的老 `clash
 
 - `node_searcher.py` — 主程序（单文件，桌面窗口 + 浏览器界面双模式）
 - `run.bat` — Windows 双击启动（自动挑 Python、失败保留错误窗口）
+- `run.sh` — macOS / Linux 源码版启动脚本
+- `build_release.py` — 打包脚本（二进制 zip / 通用源码 zip）
+- `.github/workflows/release.yml` — 多系统自动构建并发布 Release
 - `docs/screenshot.png` — 界面截图（本说明里的界面预览）
 - `.gitignore` / `.gitattributes` — 忽略本地工具数据、固定 `run.bat` 为 CRLF
 - `README.md` — 本说明

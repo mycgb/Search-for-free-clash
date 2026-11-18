@@ -12,6 +12,12 @@ env/
 .workbuddy/
 .playwright-mcp/
 
+# PyInstaller / release build output
+build/
+dist/
+out/
+*.spec
+
 # Temp / debug artifacts
 _tmp_*
 *.log

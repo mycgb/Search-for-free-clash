@@ -41,7 +41,27 @@ except ImportError:
 
 # 控制台输出统一用 ASCII（原因见 run.bat 顶部注释）：不强制 stdout 为 UTF-8，
 # 否则中文 Windows 的 936 代码页窗口会把 UTF-8 字节显示成乱码。
-# 这里只放宽编码错误，避免个别环境的编码差异直接把程序打崩。
+# PyInstaller 的 --windowed / --noconsole 构建里 sys.stdout / sys.stderr 是 None，
+# 不先补一个哑 writer，任何 print() 都会抛 AttributeError 让打包版直接崩掉。
+class _NullWriter:
+    def write(self, *args, **kwargs):
+        return 0
+
+    def writelines(self, lines):
+        for line in lines:
+            self.write(line)
+
+    def flush(self):
+        pass
+
+    def isatty(self):
+        return False
+
+
+if sys.stdout is None:
+    sys.stdout = _NullWriter()
+if sys.stderr is None:
+    sys.stderr = _NullWriter()
 try:
     sys.stdout.reconfigure(errors="replace")
     sys.stderr.reconfigure(errors="replace")
@@ -1172,6 +1192,10 @@ def _relaunch_with_tk():
     import subprocess
 
     if os.environ.get("NODE_SEARCHER_RELAUNCH") == "1":
+        return False
+    # PyInstaller 打包版没有可复用的 .py 入口，且 tkinter 已随包打进去；
+    # 这里若 HAS_TK=False 说明打包时缺 Tk，直接交给浏览器界面兜底即可。
+    if getattr(sys, "frozen", False):
         return False
     for exe in _candidate_pythons():
         try:

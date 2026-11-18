@@ -5,8 +5,10 @@
 # Screenshots are binary: never apply newline conversion.
 *.png binary
 
-# Source / docs are stored with LF in the repository.
+# Source / docs / shell scripts are stored with LF in the repository.
 *.py text eol=lf
 *.md text eol=lf
+*.sh text eol=lf
+*.yml text eol=lf
 .gitignore text eol=lf
 .gitattributes text eol=lf
