@@ -70,7 +70,7 @@ except Exception:
 
 APP_TITLE = "免费节点搜索器 — GitHub / Bing 双引擎"
 APP_AUTHOR = "mycgb"
-APP_VERSION = "v1.0"
+APP_VERSION = "v1.0.0"
 
 ABOUT_TEXT = f"""\
 免费节点搜索器  {APP_VERSION}
